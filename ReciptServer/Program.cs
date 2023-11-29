@@ -79,27 +79,28 @@ namespace sqltest
                 Console.WriteLine("Recipt read sucessfully!");
                 Console.WriteLine("Recipt at store: "+recipt.StoreName);
                 
-
-
                 return "";
             });
 
             //Inserts recipt into database
             events.Add("/insert_user", (JObject? body) =>
             {
+                //Needs Database
+                if (db == null) return "No Database";
+
                 //Deserialize
                 if (body == null) return "Body not found";
                 //User
-                if (body["Email"] == null) return "User object not found";
+                if (body["email"] == null) return "User object not found";
                 //Password
-                if (body["Password"] == null) return "Password object not found";
+                if (body["password"] == null) return "Password object not found";
 
+                //Insert into Database
                 MySqlCommand comm = db.Connection.CreateCommand();
                 comm.CommandText = "INSERT INTO User(Email, Password) VALUES (?email, ?password);";
-                comm.Parameters.Add("?email", MySqlDbType.VarChar).Value = body["Email"]!.ToString();
-                comm.Parameters.Add("?password", MySqlDbType.VarChar).Value = body["Password"]!.ToString();
+                comm.Parameters.Add("?email", MySqlDbType.VarChar).Value = body["email"]!.ToString();
+                comm.Parameters.Add("?password", MySqlDbType.VarChar).Value = body["password"]!.ToString();
                 comm.ExecuteNonQuery();
-                db.Connection.Close();
 
                 return "User created";
             });
