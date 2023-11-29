@@ -78,18 +78,28 @@ namespace sqltest
 
                 Console.WriteLine("Recipt read sucessfully!");
                 Console.WriteLine("Recipt at store: "+recipt.StoreName);
-                /*
+                
+
+
                 //Insert store
                 MySqlCommand comm = db.Connection.CreateCommand();
-                comm.CommandText = "INSERT INTO Store(Email, Password) VALUES (?email, ?password);";
+                comm.CommandText = "INSERT INTO Stores(Name, State, City, PostalCode, Address) VALUES (?name, ?state, ?city, ?postal, ?address);";
 
-                comm.Parameters.Add("?email", MySqlDbType.VarChar).Value = body["email"]!.ToString();
-                comm.Parameters.Add("?password", MySqlDbType.VarChar).Value = body["password"]!.ToString();
+                comm.Parameters.Add("?name", MySqlDbType.VarChar).Value = recipt.StoreName;
+                comm.Parameters.Add("?state", MySqlDbType.VarChar).Value = recipt.State;
+                comm.Parameters.Add("?city", MySqlDbType.VarChar).Value = recipt.City;
+                comm.Parameters.Add("?postal", MySqlDbType.VarChar).Value = recipt.PostalCode;
+                comm.Parameters.Add("?address", MySqlDbType.VarChar).Value = recipt.Street;
 
                 comm.ExecuteNonQuery();
 
+                //Get store ID
+                string id = "ERROR";
+                foreach (DataRow row in db.Query("SELECT MAX(StoreId) FROM tracker.stores")) id = row[0].ToString();
 
+                Console.WriteLine(id);
 
+                /*
                 //Get store id
                 string id = "ERROR";
                 foreach (DataRow row in db.Query("SELECT MAX(StoreId) FROM tracker.stores")) id = row[0].ToString();
