@@ -17,7 +17,7 @@ namespace sqltest
         
         static void Main(string[] args)
         {
-            
+            /*
             //DataBase
             DataBase db = new DataBase("world");
             string query = "use world; SELECT * FROM city; ";
@@ -28,7 +28,7 @@ namespace sqltest
             }
 
             db.Close();
-            
+            */
 
             //HTTP Server
             Dictionary<string, HttpRequest> events = new();
@@ -40,6 +40,8 @@ namespace sqltest
                 if(body["Metadata"] != null) { return body["Metadata"]!.ToString(); }
                 return "No metadata";
             });
+
+            //events.Add("/user", (JObject? body) => { })
 
             HttpServer server = new HttpServer(events);
 

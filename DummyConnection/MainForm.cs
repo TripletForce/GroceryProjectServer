@@ -13,29 +13,13 @@ namespace DummyConnection
         {
             InitializeComponent();
 
-            Request("/form", new { Metadata = "abc", ABC = "abc" });
+            Server.Request(
+                "/form", 
+                new { Metadata = "abc123", ABC = "abc" },
+                (string response) => { MessageBox.Show(response); }
+           );
         }
 
-        static async void Request(string path, object body)
-        {
 
-            HttpClient httpClient = new HttpClient();
-            httpClient.Timeout = new TimeSpan(1, 1, 1);
-
-            MultipartFormDataContent form = new MultipartFormDataContent();
-            var jsonBytes = JsonSerializer.SerializeToUtf8Bytes(body);
-            form.Add(new ByteArrayContent(jsonBytes), "entry");
-
-            try
-            {
-                HttpResponseMessage response = await httpClient.PostAsync("http://localhost:8000"+path, form);
-                string strContent = await response.Content.ReadAsStringAsync();
-                MessageBox.Show(strContent);
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show("No connection");
-            }
-        }
     }
 }
