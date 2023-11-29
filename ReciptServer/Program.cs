@@ -149,7 +149,7 @@ namespace sqltest
                 string id = "ERROR";
                 foreach (DataRow row in db.Query("SELECT MAX(UserId) FROM tracker.users")) id = row[0].ToString();
 
-                return "User created: "+id;
+                return id;
             });
 
             
