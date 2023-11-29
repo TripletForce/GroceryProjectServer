@@ -18,15 +18,7 @@ namespace sqltest
     {
         static void Main(string[] args)
         {
-            /*
-            //Database Example Query useing the world database
-            string query = "use world; SELECT * FROM city; ";
-
-            foreach (DataRow row in db.Query(query))
-            {
-                Console.WriteLine(row[0]+": "+row[1]);
-            }
-            */
+        
 
             //Local DataBase 
             DataBase? db;
@@ -42,7 +34,16 @@ namespace sqltest
                 Console.WriteLine(ex.Message);
                 db = null;
             }
+    
+            /*
+            //Database Example Query useing the world database
+            string query = "use world; SELECT * FROM city; ";
 
+            foreach (DataRow row in db.Query(query))
+            {
+                Console.WriteLine(row[0]+": "+row[1]);
+            }
+            */
 
             //HTTP Server
             Dictionary<string, HttpRequest> events = new();
@@ -58,7 +59,7 @@ namespace sqltest
             {
                 if (body == null) return "No body.";
                 if(body["Metadata"] != null) { return body["Metadata"]!.ToString(); }
-                return "No metadata";
+                return "No Metadata";
             });
             
             //Inserts recipt into database
@@ -75,15 +76,41 @@ namespace sqltest
                 if (recipt == null) 
                     return "";
 
-                //Do something with the reciept
                 Console.WriteLine("Recipt read sucessfully!");
                 Console.WriteLine("Recipt at store: "+recipt.StoreName);
-                
+                /*
+                //Insert store
+                MySqlCommand comm = db.Connection.CreateCommand();
+                comm.CommandText = "INSERT INTO Store(Email, Password) VALUES (?email, ?password);";
+
+                comm.Parameters.Add("?email", MySqlDbType.VarChar).Value = body["email"]!.ToString();
+                comm.Parameters.Add("?password", MySqlDbType.VarChar).Value = body["password"]!.ToString();
+
+                comm.ExecuteNonQuery();
+
+
+
+                //Get store id
+                string id = "ERROR";
+                foreach (DataRow row in db.Query("SELECT MAX(StoreId) FROM tracker.stores")) id = row[0].ToString();
+
+                //Insert recipt
+                MySqlCommand comm = db.Connection.CreateCommand();
+                comm.CommandText = "INSERT INTO Users(Email, Password) VALUES (?email, ?password);";
+
+                comm.Parameters.Add("?email", MySqlDbType.VarChar).Value = body["email"]!.ToString();
+                comm.Parameters.Add("?password", MySqlDbType.VarChar).Value = body["password"]!.ToString();
+
+                comm.ExecuteNonQuery();
+
+                */
+
+
                 return "";
             });
 
             //Inserts recipt into database
-            events.Add("/insert_user", (JObject? body) =>
+            events.Add("/update_user", (JObject? body) =>
             {
                 //Needs Database
                 if (db == null) return "No Database";
@@ -97,13 +124,19 @@ namespace sqltest
 
                 //Insert into Database
                 MySqlCommand comm = db.Connection.CreateCommand();
-                comm.CommandText = "INSERT INTO User(Email, Password) VALUES (?email, ?password);";
+                comm.CommandText = "INSERT INTO Users(Email, Password) VALUES (?email, ?password);";
                 comm.Parameters.Add("?email", MySqlDbType.VarChar).Value = body["email"]!.ToString();
                 comm.Parameters.Add("?password", MySqlDbType.VarChar).Value = body["password"]!.ToString();
                 comm.ExecuteNonQuery();
 
-                return "User created";
+                //Get the id
+                string id = "ERROR";
+                foreach (DataRow row in db.Query("SELECT MAX(UserId) FROM tracker.users")) id = row[0].ToString();
+
+                return "User created: "+id;
             });
+
+            
 
             //Start the server
             HttpServer server = new HttpServer(events);

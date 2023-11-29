@@ -28,13 +28,19 @@ namespace ReciptServer
             Connection.Open();
         }
 
-        public DataTable Query(string query)
+        public IEnumerable<DataRow> Query(string query)
         {
             var cmd = new MySqlCommand(query, Connection);
             var reader = cmd.ExecuteReader();
 
             DataTable dt = new DataTable();
-            return dt;
+            dt.Load(reader);
+            int numberOfResults = dt.Rows.Count;
+
+            foreach (DataRow dr in dt.Rows)
+            {
+                yield return dr;
+            }
         }
 
         /*

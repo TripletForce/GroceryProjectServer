@@ -15,7 +15,7 @@ namespace DummyConnection
 
             Server.Request(
                 "/insert_user", 
-                new { email = "kael@ksu.edu", password = "abc123" },
+                new { email = "kaelwilliam@ksu.edu", password = "abc123" },
                 (string response) => { MessageBox.Show(response); }
            );
         }
