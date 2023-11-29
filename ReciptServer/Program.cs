@@ -8,6 +8,8 @@ using MySql.Data;
 using MySql.Data.MySqlClient;
 using ReciptServer;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
+using Microsoft.IdentityModel.Abstractions;
 //https://stackoverflow.com/questions/49035178/unable-to-locate-system-data-sqlclient-reference
 
 namespace sqltest
@@ -41,7 +43,24 @@ namespace sqltest
                 return "No metadata";
             });
 
-            //events.Add("/user", (JObject? body) => { })
+            events.Add("/log_receipt", (JObject? body) =>
+            {
+                //Deserialize
+                if (body == null) 
+                    return "Body not found";
+                if (body["Receipt"] == null) 
+                    return "Receipt object not found";
+                string receiptString = body["Receipt"]!.ToString();
+                Receipt? recipt = JsonConvert.DeserializeObject<Receipt>(receiptString);
+                if (recipt == null) 
+                    return "";
+
+                //Do something with the reciept
+                Console.WriteLine("Recipt read sucessfully!");
+                Console.WriteLine("Recipt at store: "+recipt.StoreName);
+
+                return "";
+            });
 
             HttpServer server = new HttpServer(events);
 

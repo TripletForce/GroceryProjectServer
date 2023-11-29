@@ -1,8 +1,9 @@
 {
   "ExpandedNodes": [
     "",
+    "\\DummyConnection",
     "\\ReciptServer"
   ],
-  "SelectedNode": "\\ReciptServer\\Program.cs",
+  "SelectedNode": "\\DummyConnection\\MainForm.cs",
   "PreviewInSolutionExplorer": false
 }
