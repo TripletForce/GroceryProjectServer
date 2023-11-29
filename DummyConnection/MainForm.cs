@@ -26,11 +26,16 @@ namespace DummyConnection
             var jsonBytes = JsonSerializer.SerializeToUtf8Bytes(body);
             form.Add(new ByteArrayContent(jsonBytes), "entry");
 
-            HttpResponseMessage response = await httpClient.PostAsync("http://localhost:8000"+path, form);
-
-            string strContent = await response.Content.ReadAsStringAsync();
-
-            MessageBox.Show(strContent);
+            try
+            {
+                HttpResponseMessage response = await httpClient.PostAsync("http://localhost:8000"+path, form);
+                string strContent = await response.Content.ReadAsStringAsync();
+                MessageBox.Show(strContent);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("No connection");
+            }
         }
     }
 }

@@ -37,7 +37,8 @@ namespace sqltest
             events.Add("/form", (JObject? body) =>
             {
                 if (body == null) return "No body.";
-                return body["Metadata"].ToString();
+                if(body["Metadata"] != null) { return body["Metadata"]!.ToString(); }
+                return "No metadata";
             });
 
             HttpServer server = new HttpServer(events);
