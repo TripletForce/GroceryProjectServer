@@ -1,0 +1,5 @@
+C:\Users\Kael\source\repos\ReciptServer\obj\Debug\net7.0\ReciptServer.csproj.AssemblyReference.cache
+C:\Users\Kael\source\repos\ReciptServer\obj\Debug\net7.0\ReciptServer.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Kael\source\repos\ReciptServer\obj\Debug\net7.0\ReciptServer.AssemblyInfoInputs.cache
+C:\Users\Kael\source\repos\ReciptServer\obj\Debug\net7.0\ReciptServer.AssemblyInfo.cs
+C:\Users\Kael\source\repos\ReciptServer\obj\Debug\net7.0\ReciptServer.csproj.CoreCompileInputs.cache

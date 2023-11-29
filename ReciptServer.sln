@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33424.131
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReciptServer", "ReciptServer\ReciptServer.csproj", "{1B9E5D8A-71A8-404B-B6B8-12C6656544FE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DummyConnection", "DummyConnection\DummyConnection.csproj", "{A23A617F-9422-4CD6-8FF2-42BA0A71F4BD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SqlScripts", "SqlScripts", "{B826B0EE-9D21-42A3-8EE8-785FF49EB8A2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1B9E5D8A-71A8-404B-B6B8-12C6656544FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B9E5D8A-71A8-404B-B6B8-12C6656544FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B9E5D8A-71A8-404B-B6B8-12C6656544FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B9E5D8A-71A8-404B-B6B8-12C6656544FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A23A617F-9422-4CD6-8FF2-42BA0A71F4BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A23A617F-9422-4CD6-8FF2-42BA0A71F4BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A23A617F-9422-4CD6-8FF2-42BA0A71F4BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A23A617F-9422-4CD6-8FF2-42BA0A71F4BD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0F988119-12AB-4D63-912D-DA54C26147EA}
+	EndGlobalSection
+EndGlobal

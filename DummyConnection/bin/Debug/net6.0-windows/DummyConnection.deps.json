@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v6.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v6.0": {
+      "DummyConnection/1.0.0": {
+        "runtime": {
+          "DummyConnection.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "DummyConnection/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
