@@ -12,6 +12,7 @@ using System.Text;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using static System.Net.WebRequestMethods;
 
 namespace ReciptServer
 {
@@ -21,7 +22,9 @@ namespace ReciptServer
     {
         private static Dictionary<string, HttpRequest> RequestDelegates = new();
         private static HttpListener listener = new HttpListener();
-        private const string URL = "http://localhost:8000/";
+        private const string URL = "http://*:8000/";
+        //private const string URL = "http://localhost:8000/";
+        //private const string URL = "http://192.168.0.102:8000/";
 
         public static async Task HandleIncomingConnections()
         {

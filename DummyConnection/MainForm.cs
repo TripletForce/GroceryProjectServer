@@ -14,8 +14,8 @@ namespace DummyConnection
             InitializeComponent();
 
             Server.Request(
-                "/form", 
-                new { Metadata = "abc123", ABC = "abc" },
+                "/insert_user", 
+                new { Email = "kael@ksu.edu", Password = "abc123" },
                 (string response) => { MessageBox.Show(response); }
            );
         }

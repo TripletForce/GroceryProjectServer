@@ -16,7 +16,6 @@ namespace sqltest
 {
     class Program
     {
-        
         static void Main(string[] args)
         {
             /*
@@ -29,19 +28,21 @@ namespace sqltest
             }
             */
 
-            //DataBase
+            //Local DataBase 
             DataBase? db;
             try 
             {
-                db = new DataBase("world");
+                Console.WriteLine("___Trying to Connect to Local Database___");
+                db = new DataBase("tracker", true);
                 Console.WriteLine("___Database Connected___");
             }
             catch (Exception ex)
             {
-                Console.WriteLine("___Unable to connect to Database___");
+                Console.WriteLine("___Unable to connect to Local Database___");
                 Console.WriteLine(ex.Message);
                 db = null;
             }
+
 
             //HTTP Server
             Dictionary<string, HttpRequest> events = new();
@@ -50,7 +51,7 @@ namespace sqltest
             events.Add("/test", (JObject? body) => "The server is running");
 
             //Status of Database
-            events.Add("/db_status", (JObject? body) => db == null ? "Could not find Database" : "Found Database");
+            events.Add("/db_status", (JObject? body) => null == db ? "Could not find Database" : "Found Database");
 
             //Example Form: retuns Metadata value as string
             events.Add("/form", (JObject? body) =>
@@ -77,8 +78,30 @@ namespace sqltest
                 //Do something with the reciept
                 Console.WriteLine("Recipt read sucessfully!");
                 Console.WriteLine("Recipt at store: "+recipt.StoreName);
-               
+                
+
+
                 return "";
+            });
+
+            //Inserts recipt into database
+            events.Add("/insert_user", (JObject? body) =>
+            {
+                //Deserialize
+                if (body == null) return "Body not found";
+                //User
+                if (body["Email"] == null) return "User object not found";
+                //Password
+                if (body["Password"] == null) return "Password object not found";
+
+                MySqlCommand comm = db.Connection.CreateCommand();
+                comm.CommandText = "INSERT INTO User(Email, Password) VALUES (?email, ?password);";
+                comm.Parameters.Add("?email", MySqlDbType.VarChar).Value = body["Email"]!.ToString();
+                comm.Parameters.Add("?password", MySqlDbType.VarChar).Value = body["Password"]!.ToString();
+                comm.ExecuteNonQuery();
+                db.Connection.Close();
+
+                return "User created";
             });
 
             //Start the server

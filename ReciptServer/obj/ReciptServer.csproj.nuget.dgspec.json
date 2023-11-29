@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Kael\\source\\repos\\GroceryProjectServer\\ReciptServer\\ReciptServer.csproj": {}
+    "C:\\Users\\Kael\\Source\\Repos\\GroceryProjectServer\\ReciptServer\\ReciptServer.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Kael\\source\\repos\\GroceryProjectServer\\ReciptServer\\ReciptServer.csproj": {
+    "C:\\Users\\Kael\\Source\\Repos\\GroceryProjectServer\\ReciptServer\\ReciptServer.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Kael\\source\\repos\\GroceryProjectServer\\ReciptServer\\ReciptServer.csproj",
+        "projectUniqueName": "C:\\Users\\Kael\\Source\\Repos\\GroceryProjectServer\\ReciptServer\\ReciptServer.csproj",
         "projectName": "ReciptServer",
-        "projectPath": "C:\\Users\\Kael\\source\\repos\\GroceryProjectServer\\ReciptServer\\ReciptServer.csproj",
+        "projectPath": "C:\\Users\\Kael\\Source\\Repos\\GroceryProjectServer\\ReciptServer\\ReciptServer.csproj",
         "packagesPath": "C:\\Users\\Kael\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Kael\\source\\repos\\GroceryProjectServer\\ReciptServer\\obj\\",
+        "outputPath": "C:\\Users\\Kael\\Source\\Repos\\GroceryProjectServer\\ReciptServer\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Kael\\AppData\\Roaming\\NuGet\\NuGet.Config",
