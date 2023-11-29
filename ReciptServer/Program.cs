@@ -34,16 +34,6 @@ namespace sqltest
                 Console.WriteLine(ex.Message);
                 db = null;
             }
-    
-            /*
-            //Database Example Query useing the world database
-            string query = "use world; SELECT * FROM city; ";
-
-            foreach (DataRow row in db.Query(query))
-            {
-                Console.WriteLine(row[0]+": "+row[1]);
-            }
-            */
 
             //HTTP Server
             Dictionary<string, HttpRequest> events = new();
@@ -75,6 +65,10 @@ namespace sqltest
                 Receipt? recipt = JsonConvert.DeserializeObject<Receipt>(receiptString);
                 if (recipt == null) 
                     return "";
+                //UserId
+                //if (body["UserId"] == null)
+                    //return "UserId object not found";
+                //string userId = body["UserId"]!.ToString();
 
                 Console.WriteLine("Recipt read sucessfully!");
                 Console.WriteLine("Recipt at store: "+recipt.StoreName);
@@ -93,28 +87,40 @@ namespace sqltest
 
                 comm.ExecuteNonQuery();
 
-                //Get store ID
-                string id = "ERROR";
-                foreach (DataRow row in db.Query("SELECT MAX(StoreId) FROM tracker.stores")) id = row[0].ToString();
-
-                Console.WriteLine(id);
-
-                /*
-                //Get store id
-                string id = "ERROR";
-                foreach (DataRow row in db.Query("SELECT MAX(StoreId) FROM tracker.stores")) id = row[0].ToString();
+                //Get the id
+                int storeId = -1;
+                foreach (DataRow row in db.Query("SELECT MAX(UserId) FROM tracker.users")) storeId = int.Parse(row[0].ToString());
 
                 //Insert recipt
-                MySqlCommand comm = db.Connection.CreateCommand();
-                comm.CommandText = "INSERT INTO Users(Email, Password) VALUES (?email, ?password);";
+                comm = db.Connection.CreateCommand();
+                comm.CommandText = "INSERT INTO Receipts(StoreId, UserId, ReceiptDate, Subtotal, Tax, Total, PhoneNumber, PaymentType) VALUE (?store_id, 1, CURRENT_TIMESTAMP, ?sub_total, ?tax, ?total, ?phone, ?payment);";
 
-                comm.Parameters.Add("?email", MySqlDbType.VarChar).Value = body["email"]!.ToString();
-                comm.Parameters.Add("?password", MySqlDbType.VarChar).Value = body["password"]!.ToString();
+                comm.Parameters.Add("?phone", MySqlDbType.VarChar).Value = recipt.PhoneNumber;
+                comm.Parameters.Add("?sub_total", MySqlDbType.Decimal).Value = recipt.SubTotal;
+                comm.Parameters.Add("?total", MySqlDbType.Decimal).Value = recipt.Total;
+                comm.Parameters.Add("?tax", MySqlDbType.Decimal).Value = recipt.Total;
+                comm.Parameters.Add("?payment", MySqlDbType.Enum).Value = recipt.PaymentType;
+                comm.Parameters.Add("?store_id", MySqlDbType.Int64).Value = storeId;
 
                 comm.ExecuteNonQuery();
 
-                */
+                //Get the id
+                int reciptId = -1;
+                foreach (DataRow row in db.Query("SELECT MAX(UserId) FROM tracker.receipts")) reciptId = int.Parse(row[0].ToString());
 
+                //Insert the Items
+                foreach(PurchasedItem item in recipt.PurchasedItems)
+                {
+                    comm = db.Connection.CreateCommand();
+                    comm.CommandText = "INSERT INTO Items(ReceiptId, Name, Price, Quantity) VALUE (?receipt_id, ?name, ?price, ?quantity);";
+
+                    comm.Parameters.Add("?name", MySqlDbType.VarChar).Value = item.Name;
+                    comm.Parameters.Add("?price", MySqlDbType.Decimal).Value = item.Price;
+                    comm.Parameters.Add("?quantity", MySqlDbType.VarChar).Value = 1; // item.Quantity;
+                    comm.Parameters.Add("?receipt_id", MySqlDbType.Int64).Value = reciptId;
+
+                    comm.ExecuteNonQuery();
+                }
 
                 return "";
             });
