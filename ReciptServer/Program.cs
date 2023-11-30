@@ -15,8 +15,6 @@ namespace sqltest
     {
         static void Main(string[] args)
         {
-        
-
             //Local DataBase 
             DataBase? db;
             try 
@@ -130,7 +128,7 @@ namespace sqltest
             });
 
             //Inserts user into database
-            events.Add("/update_user", (JObject? body) =>
+            events.Add("/insert_user", (JObject? body) =>
             {
                 //Needs Database
                 if (db == null) return "No Database";
@@ -142,16 +140,24 @@ namespace sqltest
                 //Password
                 if (body["password"] == null) return "Password object not found";
 
-                //Insert into Database
-                MySqlCommand comm = db.Connection.CreateCommand();
-                comm.CommandText = "INSERT INTO Users(Email, Password) VALUES (?email, ?password);";
-                comm.Parameters.Add("?email", MySqlDbType.VarChar).Value = body["email"]!.ToString();
-                comm.Parameters.Add("?password", MySqlDbType.VarChar).Value = body["password"]!.ToString();
-                comm.ExecuteNonQuery();
+                //If username found, grab the id
+                foreach(DataRow dr in db.Query("SELECT UserId FROM tracker.users WHERE Email = ?email && Password = ?password", new() { 
+                    ("?email", MySqlDbType.VarChar, body["email"].ToString() ),
+                    ("?password", MySqlDbType.VarChar, body["password"].ToString() )
+                }))
+                {
+                    return dr[0].ToString();
+                }
 
-                //Get the id
                 try
                 {
+                    //Insert into Database
+                    MySqlCommand comm = db.Connection.CreateCommand();
+                    comm.CommandText = "INSERT INTO Users(Email, Password) VALUES (?email, ?password);";
+                    comm.Parameters.Add("?email", MySqlDbType.VarChar).Value = body["email"]!.ToString();
+                    comm.Parameters.Add("?password", MySqlDbType.VarChar).Value = body["password"]!.ToString();
+                    comm.ExecuteNonQuery();
+
                     string? id = "-1";
                     foreach (DataRow row in db.Query("SELECT MAX(UserId) FROM tracker.users", new() { })) id = row[0].ToString();
                     if (id == null) return "-1";
@@ -250,7 +256,7 @@ namespace sqltest
 
                 string response = JsonConvert.SerializeObject(result);
                 return response;
-            });        
+            });
             
             //Number of Items
             events.Add("/count_stores", (JObject? body) =>
@@ -330,7 +336,45 @@ namespace sqltest
                 return response;
             });
 
-            
+            //User information
+            events.Add("/user_information", (JObject? body) =>
+            {
+                //Needs Database
+                if (db == null) return "No Database";
+                //UserId
+                if (body["UserId"] == null)
+                    return "UserId object not found";
+                string userId = body["UserId"]!.ToString();
+
+                //UserId, Email, JoinDate, Spent, UploadedRecipts
+                List<(string, string, string, decimal, int)> result = new();
+                foreach (DataRow row in db.Query(@"
+                    SELECT U.UserId,
+	                    U.Email,
+                        U.JoinDate,
+                        COALESCE(SUM(I.Price*I.Quantity), 0) AS Spent,
+                        COUNT(DISTINCT R.ReceiptId) AS UploadedRecipts
+                    FROM tracker.users U
+	                    LEFT JOIN tracker.receipts R ON R.UserId = U.UserId
+	                    LEFT JOIN tracker.items I ON I.ReceiptId = R.ReceiptId
+                    WHERE U.UserId = ?user_id
+                    GROUP BY U.Email, U.JoinDate;
+                ", new() {( "?user_id", MySqlDbType.VarChar, userId )}))
+                {
+                    result.Add(new
+                    (
+                        row[0].ToString()!, //UserId
+                        row[1].ToString()!, //Email 
+                        row[2].ToString()!, //JoinDate
+                        Convert.ToDecimal(row[3].ToString())!, // TotalSpent
+                        int.Parse(row[4].ToString()!) //Recipts
+                    ));
+                }
+                string response = JsonConvert.SerializeObject(result);
+                return response;
+            });
+
+
 
             //Start the server
             HttpServer server = new HttpServer(events);

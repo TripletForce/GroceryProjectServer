@@ -43,6 +43,7 @@ namespace ReciptServer
 
             foreach (DataRow dr in dt.Rows)
             {
+                if (dr == null) break;
                 yield return dr;
             }
         }
