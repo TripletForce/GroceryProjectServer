@@ -202,7 +202,8 @@ namespace sqltest
                         FROM tracker.items I
 	                        INNER JOIN tracker.receipts R ON I.ReceiptId = R.ReceiptId
                         WHERE R.UserId = ?user_id
-                        GROUP BY Name;
+                        GROUP BY Name
+                        ORDER BY Spent DESC;
                     ", new() { ("?user_id", MySqlDbType.VarChar, userId) }))
                 {
                     items.Add((row[0].ToString(), Convert.ToDecimal(row[1].ToString())));
@@ -351,9 +352,9 @@ namespace sqltest
                 foreach (DataRow row in db.Query(@"
                     SELECT U.UserId,
 	                    U.Email,
-                        U.JoinDate,
-                        COALESCE(SUM(I.Price*I.Quantity), 0) AS Spent,
-                        COUNT(DISTINCT R.ReceiptId) AS UploadedRecipts
+	                    DATE(U.JoinDate) AS JoinDate,
+	                    COALESCE(SUM(I.Price*I.Quantity), 0) AS Spent,
+	                    COUNT(DISTINCT R.ReceiptId) AS UploadedRecipts
                     FROM tracker.users U
 	                    LEFT JOIN tracker.receipts R ON R.UserId = U.UserId
 	                    LEFT JOIN tracker.items I ON I.ReceiptId = R.ReceiptId
@@ -365,8 +366,9 @@ namespace sqltest
                     (
                         row[0].ToString()!, //UserId
                         row[1].ToString()!, //Email 
-                        row[2].ToString()!, //JoinDate
+                        row[2].ToString()!.Substring(0, 11), //JoinDate
                         Convert.ToDecimal(row[3].ToString())!, // TotalSpent
+                        
                         int.Parse(row[4].ToString()!) //Recipts
                     ));
                 }

@@ -38,10 +38,10 @@ CREATE TABLE Receipts
    StoreId INT NOT NULL,
    UserId INT NOT NULL,
    ReceiptDate DATETIME NOT NULL,
-   Subtotal DECIMAL NOT NULL,
-   Tax DECIMAL NOT NULL,
-   Total DECIMAL NOT NULL,
-   PhoneNumber NVARCHAR(10) NOT NULL,
+   Subtotal DECIMAL(16,2) NOT NULL,
+   Tax DECIMAL(16,2) NOT NULL,
+   Total DECIMAL(16,2) NOT NULL,
+   PhoneNumber NVARCHAR(20) NOT NULL,
    PaymentType ENUM('Debit', 'Credit', 'Cash'),
    
 	FOREIGN KEY(StoreId) REFERENCES Stores(StoreId),
@@ -52,9 +52,8 @@ CREATE TABLE Items
    ItemId INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
    ReceiptId INT NOT NULL,
    Name NVARCHAR(128) NOT NULL,
-   Price DECIMAL NOT NULL,
+   Price DECIMAL(16,2) NOT NULL,
    Quantity INT NOT NULL,
+   
    FOREIGN KEY(ReceiptId) REFERENCES Receipts(ReceiptId)
 );
-INSERT INTO Users (Email, Password) VALUES ("admin", "password");
-SHOW databases;
