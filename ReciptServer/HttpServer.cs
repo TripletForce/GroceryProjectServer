@@ -22,9 +22,8 @@ namespace ReciptServer
     {
         private static Dictionary<string, HttpRequest> RequestDelegates = new();
         private static HttpListener listener = new HttpListener();
-        private const string URL = "http://*:8000/";
-        //private const string URL = "http://localhost:8000/";
-        //private const string URL = "http://192.168.0.102:8000/";
+        //private const string URL = "http://*:8000/";
+        private const string URL = "http://localhost:8000/";
 
         public static async Task HandleIncomingConnections()
         {
@@ -72,8 +71,8 @@ namespace ReciptServer
                 if (RequestDelegates.TryGetValue(req.Url.AbsolutePath, out HttpRequest? del))
                 {
                     // Write the response info
-                    data = Encoding.UTF8.GetBytes(String.Format(del(jsonBody)));
-                    resp.ContentType = "text/html";
+                    data = Encoding.UTF8.GetBytes(del(jsonBody));
+                    resp.ContentType = "Application/json";
                     resp.ContentEncoding = Encoding.UTF8;
                     resp.ContentLength64 = data.LongLength;
                 }
@@ -81,7 +80,7 @@ namespace ReciptServer
                 {
                     // Write the response info
                     data = Encoding.UTF8.GetBytes(String.Format("Path not found: 404"));
-                    resp.ContentType = "text/html";
+                    resp.ContentType = "Application/json";
                     resp.ContentEncoding = Encoding.UTF8;
                     resp.ContentLength64 = data.LongLength;
                 }

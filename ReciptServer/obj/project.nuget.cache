@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "9yRKYbMYZgz4o+af3kLH52egC/6dOkWK9Rn1WXShw512wVptq/P0nLORJQVTdzKHNDQBefVyinYZmg/8MMc0PQ==",
+  "dgSpecHash": "v/CCCCiKeNSraBC7xc06V+NApZZPjpjPqsW2m2bAzkAjrMXAAHYgoZ0OA4G/n3nuY367qoqayk5//zPukyWWBA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Kael\\Source\\Repos\\GroceryProjectServer\\ReciptServer\\ReciptServer.csproj",
+  "projectFilePath": "C:\\Users\\Kael\\source\\repos\\GroceryProjectServer\\ReciptServer\\ReciptServer.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Kael\\.nuget\\packages\\azure.core\\1.25.0\\azure.core.1.25.0.nupkg.sha512",
     "C:\\Users\\Kael\\.nuget\\packages\\azure.identity\\1.7.0\\azure.identity.1.7.0.nupkg.sha512",

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Kael\\Source\\Repos\\GroceryProjectServer\\DummyConnection\\DummyConnection.csproj": {}
+    "C:\\Users\\Kael\\source\\repos\\GroceryProjectServer\\DummyConnection\\DummyConnection.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Kael\\Source\\Repos\\GroceryProjectServer\\DummyConnection\\DummyConnection.csproj": {
+    "C:\\Users\\Kael\\source\\repos\\GroceryProjectServer\\DummyConnection\\DummyConnection.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Kael\\Source\\Repos\\GroceryProjectServer\\DummyConnection\\DummyConnection.csproj",
+        "projectUniqueName": "C:\\Users\\Kael\\source\\repos\\GroceryProjectServer\\DummyConnection\\DummyConnection.csproj",
         "projectName": "DummyConnection",
-        "projectPath": "C:\\Users\\Kael\\Source\\Repos\\GroceryProjectServer\\DummyConnection\\DummyConnection.csproj",
+        "projectPath": "C:\\Users\\Kael\\source\\repos\\GroceryProjectServer\\DummyConnection\\DummyConnection.csproj",
         "packagesPath": "C:\\Users\\Kael\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Kael\\Source\\Repos\\GroceryProjectServer\\DummyConnection\\obj\\",
+        "outputPath": "C:\\Users\\Kael\\source\\repos\\GroceryProjectServer\\DummyConnection\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Kael\\AppData\\Roaming\\NuGet\\NuGet.Config",

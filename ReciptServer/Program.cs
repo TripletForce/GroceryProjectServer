@@ -1,16 +1,11 @@
-﻿//using Data;
-using System.Data;
-using System.Net;
-using System.Text;
-using System.Text.Json.Nodes;
-using Microsoft.Data.SqlClient;
-using MySql.Data;
+﻿using System.Data;
 using MySql.Data.MySqlClient;
 using ReciptServer;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
-using Microsoft.IdentityModel.Abstractions;
-//https://stackoverflow.com/questions/49035178/unable-to-locate-system-data-sqlclient-reference
+using System.Collections.Generic;
+using System.Diagnostics;
+
 
 namespace sqltest
 {
@@ -65,19 +60,22 @@ namespace sqltest
                 Receipt? recipt = JsonConvert.DeserializeObject<Receipt>(receiptString);
                 if (recipt == null) 
                     return "";
+                
                 //UserId
-                //if (body["UserId"] == null)
-                    //return "UserId object not found";
-                //string userId = body["UserId"]!.ToString();
+                if (body["UserId"] == null)
+                    return "UserId object not found";
+                string userId = body["UserId"]!.ToString();
 
                 Console.WriteLine("Recipt read sucessfully!");
                 Console.WriteLine("Recipt at store: "+recipt.StoreName);
-                
-
 
                 //Insert store
                 MySqlCommand comm = db.Connection.CreateCommand();
-                comm.CommandText = "INSERT INTO Stores(Name, State, City, PostalCode, Address) VALUES (?name, ?state, ?city, ?postal, ?address);";
+                //comm.CommandText = "INSERT INTO Stores(Name, State, City, PostalCode, Address) VALUES (?name, ?state, ?city, ?postal, ?address);";
+
+                comm.CommandText = "INSERT INTO Stores(Name, State, City, PostalCode, Address) VALUES(?name, ?state, ?city, ?postal, ?address) " +
+                    "ON DUPLICATE KEY UPDATE " +
+                    "Name = ?name, State = ?state, City = ?city, PostalCode = ?postal, Address = ?address;";
 
                 comm.Parameters.Add("?name", MySqlDbType.VarChar).Value = recipt.StoreName;
                 comm.Parameters.Add("?state", MySqlDbType.VarChar).Value = recipt.State;
@@ -87,18 +85,20 @@ namespace sqltest
 
                 comm.ExecuteNonQuery();
 
-                //Get the id
+                //Get the store id
                 int storeId = -1;
-                foreach (DataRow row in db.Query("SELECT MAX(UserId) FROM tracker.users")) storeId = int.Parse(row[0].ToString());
+                foreach (DataRow row in db.Query("SELECT StoreId FROM tracker.stores WHERE Address = ?address", new () { ("?address", MySqlDbType.VarChar, recipt.Street) })) 
+                    storeId = int.Parse(row[0].ToString());
 
                 //Insert recipt
                 comm = db.Connection.CreateCommand();
-                comm.CommandText = "INSERT INTO Receipts(StoreId, UserId, ReceiptDate, Subtotal, Tax, Total, PhoneNumber, PaymentType) VALUE (?store_id, 1, CURRENT_TIMESTAMP, ?sub_total, ?tax, ?total, ?phone, ?payment);";
+                comm.CommandText = "INSERT INTO Receipts(StoreId, UserId, ReceiptDate, Subtotal, Tax, Total, PhoneNumber, PaymentType) VALUE (?store_id, ?user, CURRENT_TIMESTAMP, ?sub_total, ?tax, ?total, ?phone, ?payment);";
 
+                comm.Parameters.Add("?user", MySqlDbType.VarChar).Value = userId;
                 comm.Parameters.Add("?phone", MySqlDbType.VarChar).Value = recipt.PhoneNumber;
                 comm.Parameters.Add("?sub_total", MySqlDbType.Decimal).Value = recipt.SubTotal;
                 comm.Parameters.Add("?total", MySqlDbType.Decimal).Value = recipt.Total;
-                comm.Parameters.Add("?tax", MySqlDbType.Decimal).Value = recipt.Total;
+                comm.Parameters.Add("?tax", MySqlDbType.Decimal).Value = recipt.Tax1;
                 comm.Parameters.Add("?payment", MySqlDbType.Enum).Value = recipt.PaymentType;
                 comm.Parameters.Add("?store_id", MySqlDbType.Int64).Value = storeId;
 
@@ -106,7 +106,7 @@ namespace sqltest
 
                 //Get the id
                 int reciptId = -1;
-                foreach (DataRow row in db.Query("SELECT MAX(UserId) FROM tracker.receipts")) reciptId = int.Parse(row[0].ToString());
+                foreach (DataRow row in db.Query("SELECT MAX(ReceiptId) FROM tracker.receipts", new() { })) reciptId = int.Parse(row[0].ToString());
 
                 //Insert the Items
                 foreach(PurchasedItem item in recipt.PurchasedItems)
@@ -125,7 +125,7 @@ namespace sqltest
                 return "";
             });
 
-            //Inserts recipt into database
+            //Inserts user into database
             events.Add("/update_user", (JObject? body) =>
             {
                 //Needs Database
@@ -146,13 +146,60 @@ namespace sqltest
                 comm.ExecuteNonQuery();
 
                 //Get the id
-                string id = "ERROR";
-                foreach (DataRow row in db.Query("SELECT MAX(UserId) FROM tracker.users")) id = row[0].ToString();
-
-                return id;
+                try
+                {
+                    string? id = "-1";
+                    foreach (DataRow row in db.Query("SELECT MAX(UserId) FROM tracker.users", new() { })) id = row[0].ToString();
+                    if (id == null) return "-1";
+                    return id;
+                }
+                catch
+                {
+                    return "-1";
+                }
             });
 
-            
+            events.Add("/all_items", (JObject? body) =>
+            {
+                //Needs Database
+                if (db == null) return "No Database";
+
+                List<(string, decimal)> items = new(); 
+                foreach (DataRow row in db.Query("SELECT Name, SUM(Price*Quantity) AS Spent FROM tracker.items GROUP BY Name;", new() { }))
+                {
+                    items.Add( (row[0].ToString(), Convert.ToDecimal(row[1].ToString())) );
+                }
+                string response = JsonConvert.SerializeObject(items);
+                return response;
+            });
+
+            events.Add("/all_users", (JObject? body) =>
+            {
+                //Needs Database
+                if (db == null) return "No Database";
+
+                List<(string, string)> items = new();
+                foreach (DataRow row in db.Query("Select Email, Password FROM tracker.users;", new() { }))
+                {
+                    items.Add((row[0].ToString(), row[1].ToString()));
+                }
+                string response = JsonConvert.SerializeObject(items);
+                return response;
+            });
+
+            //TODO:
+            //pie graphs
+            //datetime / spent
+            //% of stores spent
+
+            //Select
+
+            //Update store
+            //update items
+
+            //So I need to make a select statement that returns items group by name with the total cost (quantity and price differ)
+
+            //Ranking all items 
 
             //Start the server
             HttpServer server = new HttpServer(events);
