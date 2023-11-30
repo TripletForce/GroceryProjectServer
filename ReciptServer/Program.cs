@@ -5,7 +5,9 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Diagnostics;
-
+using Org.BouncyCastle.Asn1.X509;
+using Org.BouncyCastle.Utilities;
+using Org.BouncyCastle.Bcpg;
 
 namespace sqltest
 {
@@ -159,6 +161,7 @@ namespace sqltest
                 }
             });
 
+            //Brings a list of all the items back with the total that people payed for that Item
             events.Add("/all_items", (JObject? body) =>
             {
                 //Needs Database
@@ -173,6 +176,34 @@ namespace sqltest
                 return response;
             });
 
+            //Number of Items
+            events.Add("/all_items_from_user", (JObject? body) =>
+            {
+                //Needs Database
+                if (db == null) return "No Database";
+
+                //User Id
+                if (body["UserId"] == null)
+                    return "UserId object not found";
+                string userId = body["UserId"]!.ToString();
+
+                List<(string, decimal)> items = new();
+                foreach (DataRow row in db.Query(@"
+                        SELECT Name,
+	                        SUM(Price*Quantity) AS Spent
+                        FROM tracker.items I
+	                        INNER JOIN tracker.receipts R ON I.ReceiptId = R.ReceiptId
+                        WHERE R.UserId = ?user_id
+                        GROUP BY Name;
+                    ", new() { ("?user_id", MySqlDbType.VarChar, userId) }))
+                {
+                    items.Add((row[0].ToString(), Convert.ToDecimal(row[1].ToString())));
+                }
+                string response = JsonConvert.SerializeObject(items);
+                return response;
+            });
+
+            //Brings back all of the users 
             events.Add("/all_users", (JObject? body) =>
             {
                 //Needs Database
@@ -187,19 +218,104 @@ namespace sqltest
                 return response;
             });
 
+            //Number of Items
+            events.Add("/count_items", (JObject? body) =>
+            {
+                //Needs Database
+                if (db == null) return "No Database";
+
+                int result = -1;
+                foreach (DataRow row in db.Query("SELECT COUNT(*) FROM tracker.items;", new() { }))
+                {
+                    result = int.Parse(row[0].ToString());
+                }
+
+                string response = JsonConvert.SerializeObject(result);
+                return response;
+            });
+
+            //Number of Items
+            events.Add("/count_users", (JObject? body) =>
+            {
+                //Needs Database
+                if (db == null) return "No Database";
+
+                int result = -1;
+                foreach (DataRow row in db.Query("SELECT COUNT(*) FROM tracker.users;", new() { }))
+                {
+                    result = int.Parse(row[0].ToString());
+                }
+
+                string response = JsonConvert.SerializeObject(result);
+                return response;
+            });        
+            
+            //Number of Items
+            events.Add("/count_stores", (JObject? body) =>
+            {
+                //Needs Database
+                if (db == null) return "No Database";
+
+                int result = -1;
+                foreach (DataRow row in db.Query("SELECT COUNT(*) FROM tracker.stores;", new() { }))
+                {
+                    result = int.Parse(row[0].ToString());
+                }
+
+                string response = JsonConvert.SerializeObject(result);
+                return response;
+            });
+
+            //Brings back items rank by money spent on item
+            events.Add("/rank_items", (JObject? body) =>
+            {
+                //Needs Database
+                if (db == null) return "No Database";
+
+                List<(string, decimal)> items = new();
+                foreach (DataRow row in db.Query("SELECT Name, SUM(Price * Quantity) AS Spent FROM tracker.items GROUP BY Name ORDER BY Spent DESC", new() { }))
+                {
+                    items.Add((row[0].ToString(), Convert.ToDecimal(row[1].ToString())));
+                }
+                string response = JsonConvert.SerializeObject(items);
+                return response;
+            });
+            
+
             //TODO:
-            //pie graphs
-            //datetime / spent
-            //% of stores spent
 
-            //Select
+            //Brings back stores rank by money spent on store
+            events.Add("/rank_stores", (JObject? body) =>
+            {
+                //Needs Database
+                if (db == null) return "No Database";
 
-            //Update store
-            //update items
+                //Name, street, phone, money spent
+                List<(string, string, string, decimal)> items = new();
+                foreach (DataRow row in db.Query("", new() { }))
+                {
+                    //items.Add();
+                }
+                string response = JsonConvert.SerializeObject(items);
+                return response;
+            });
 
-            //So I need to make a select statement that returns items group by name with the total cost (quantity and price differ)
+            //Brings back users rank by money spent by user
+            events.Add("/rank_user", (JObject? body) =>
+            {
+                //Needs Database
+                if (db == null) return "No Database";
 
-            //Ranking all items 
+                List<(string, decimal)> items = new();
+                foreach (DataRow row in db.Query("", new() { }))
+                {
+                    //items.Add();
+                }
+                string response = JsonConvert.SerializeObject(items);
+                return response;
+            });
+
+
 
             //Start the server
             HttpServer server = new HttpServer(events);
