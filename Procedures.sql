@@ -1,4 +1,3 @@
-
 /*********************
  * Aggregating Queries
  * Note that any ?property is substitued by the server MySql library in C#

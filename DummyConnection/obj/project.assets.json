@@ -60,9 +60,9 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Kael\\source\\repos\\GroceryProjectServer\\DummyConnection\\DummyConnection.csproj",
-      "projectName": "DummyConnection",
-      "projectPath": "C:\\Users\\Kael\\source\\repos\\GroceryProjectServer\\DummyConnection\\DummyConnection.csproj",
+      "projectUniqueName": "C:\\Users\\Kael\\source\\repos\\GroceryProjectServer\\DummyConnection\\ExampleConnection.csproj",
+      "projectName": "ExampleConnection",
+      "projectPath": "C:\\Users\\Kael\\source\\repos\\GroceryProjectServer\\DummyConnection\\ExampleConnection.csproj",
       "packagesPath": "C:\\Users\\Kael\\.nuget\\packages\\",
       "outputPath": "C:\\Users\\Kael\\source\\repos\\GroceryProjectServer\\DummyConnection\\obj\\",
       "projectStyle": "PackageReference",

@@ -2871,9 +2871,9 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Kael\\source\\repos\\GroceryProjectServer\\ReciptServer\\ReciptServer.csproj",
-      "projectName": "ReciptServer",
-      "projectPath": "C:\\Users\\Kael\\source\\repos\\GroceryProjectServer\\ReciptServer\\ReciptServer.csproj",
+      "projectUniqueName": "C:\\Users\\Kael\\source\\repos\\GroceryProjectServer\\ReciptServer\\ReceiptServer.csproj",
+      "projectName": "ReceiptServer",
+      "projectPath": "C:\\Users\\Kael\\source\\repos\\GroceryProjectServer\\ReciptServer\\ReceiptServer.csproj",
       "packagesPath": "C:\\Users\\Kael\\.nuget\\packages\\",
       "outputPath": "C:\\Users\\Kael\\source\\repos\\GroceryProjectServer\\ReciptServer\\obj\\",
       "projectStyle": "PackageReference",

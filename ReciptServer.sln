@@ -3,14 +3,20 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.33424.131
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReciptServer", "ReciptServer\ReciptServer.csproj", "{1B9E5D8A-71A8-404B-B6B8-12C6656544FE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReceiptServer", "ReciptServer\ReceiptServer.csproj", "{1B9E5D8A-71A8-404B-B6B8-12C6656544FE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DummyConnection", "DummyConnection\DummyConnection.csproj", "{A23A617F-9422-4CD6-8FF2-42BA0A71F4BD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExampleConnection", "DummyConnection\ExampleConnection.csproj", "{A23A617F-9422-4CD6-8FF2-42BA0A71F4BD}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SqlScripts", "SqlScripts", "{B826B0EE-9D21-42A3-8EE8-785FF49EB8A2}"
 	ProjectSection(SolutionItems) = preProject
-		Setup.sql = Setup.sql
-		Queries.sql = Queries.sql
+		Procedures.sql = Procedures.sql
+		Tables.sql = Tables.sql
+		Data.sql = Data.sql
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{65B20A9A-1D11-4752-A433-F3D07FE862ED}"
+	ProjectSection(SolutionItems) = preProject
+		README = README
 	EndProjectSection
 EndProject
 Global

@@ -1,0 +1,9 @@
+Receipt Project Server
+
+There are two solutions. The example connection tests functionality for debuggin pourposes. The ReceiptServer solution starts at Program.
+
+The program class connects to the database, creates a list of http routes for the client to call, and then sends those events of to the HttpServer class handle the requests. 
+
+The PurchasedItems and Receipts class are the same as the client's verion and is used for a serialized connection between the client and server.
+
+Open the ReceiptServer.sln to open the application.
