@@ -281,9 +281,6 @@ namespace sqltest
                 return response;
             });
             
-
-            //TODO:
-
             //Brings back stores rank by money spent on store
             events.Add("/rank_stores", (JObject? body) =>
             {
@@ -292,9 +289,17 @@ namespace sqltest
 
                 //Name, street, phone, money spent
                 List<(string, string, string, decimal)> items = new();
-                foreach (DataRow row in db.Query("", new() { }))
+                foreach (DataRow row in db.Query(@"
+                    SELECT S.Name,
+	                    S.Address,
+                        MIN(R.PhoneNumber) AS Phone
+                    FROM tracker.stores S
+	                    LEFT JOIN tracker.receipts R ON R.StoreId = S.StoreId
+	                    INNER JOIN tracker.items I ON I.ReceiptId = R.ReceiptId
+                    GROUP BY S.Name, S.Address;
+                ", new() { }))
                 {
-                    //items.Add();
+                    items.Add((row[0].ToString(), row[1].ToString(), row[2].ToString(), Convert.ToDecimal(row[3].ToString())));
                 }
                 string response = JsonConvert.SerializeObject(items);
                 return response;
@@ -307,15 +312,22 @@ namespace sqltest
                 if (db == null) return "No Database";
 
                 List<(string, decimal)> items = new();
-                foreach (DataRow row in db.Query("", new() { }))
+                foreach (DataRow row in db.Query(@"
+                    SELECT U.Email,
+	                    SUM(I.Price*I.Quantity) AS Spent
+                    FROM tracker.users U
+	                    LEFT JOIN tracker.receipts R ON R.UserId = U.UserId
+	                    INNER JOIN tracker.items I ON I.ReceiptId = R.ReceiptId
+                    GROUP BY U.Email;
+                ", new() { }))
                 {
-                    //items.Add();
+                    items.Add((row[0].ToString(), Convert.ToDecimal(row[1].ToString())));
                 }
                 string response = JsonConvert.SerializeObject(items);
                 return response;
             });
 
-
+            
 
             //Start the server
             HttpServer server = new HttpServer(events);
