@@ -32,6 +32,8 @@ namespace sqltest
                 db = null;
             }
 
+
+
             //HTTP Server
             Dictionary<string, HttpRequest> events = new();
 
@@ -292,10 +294,11 @@ namespace sqltest
                 foreach (DataRow row in db.Query(@"
                     SELECT S.Name,
 	                    S.Address,
-                        MIN(R.PhoneNumber) AS Phone
+                        MIN(R.PhoneNumber) AS Phone,
+                        COALESCE(SUM(I.Price*I.Quantity), 0) AS Spent
                     FROM tracker.stores S
 	                    LEFT JOIN tracker.receipts R ON R.StoreId = S.StoreId
-	                    INNER JOIN tracker.items I ON I.ReceiptId = R.ReceiptId
+	                    LEFT JOIN tracker.items I ON I.ReceiptId = R.ReceiptId
                     GROUP BY S.Name, S.Address;
                 ", new() { }))
                 {
@@ -314,10 +317,10 @@ namespace sqltest
                 List<(string, decimal)> items = new();
                 foreach (DataRow row in db.Query(@"
                     SELECT U.Email,
-	                    SUM(I.Price*I.Quantity) AS Spent
+	                    COALESCE(SUM(I.Price*I.Quantity), 0) AS Spent
                     FROM tracker.users U
 	                    LEFT JOIN tracker.receipts R ON R.UserId = U.UserId
-	                    INNER JOIN tracker.items I ON I.ReceiptId = R.ReceiptId
+	                    LEFT JOIN tracker.items I ON I.ReceiptId = R.ReceiptId
                     GROUP BY U.Email;
                 ", new() { }))
                 {
