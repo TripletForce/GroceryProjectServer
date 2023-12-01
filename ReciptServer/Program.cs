@@ -59,8 +59,8 @@ namespace sqltest
                 if (body["Receipt"] == null) 
                     return "Receipt object not found";
                 string receiptString = body["Receipt"]!.ToString();
-                Receipt? recipt = JsonConvert.DeserializeObject<Receipt>(receiptString);
-                if (recipt == null) 
+                Receipt? receipt = JsonConvert.DeserializeObject<Receipt>(receiptString);
+                if (receipt == null) 
                     return "";
                 
                 //UserId
@@ -69,7 +69,7 @@ namespace sqltest
                 string userId = body["UserId"]!.ToString();
 
                 Console.WriteLine("Recipt read sucessfully!");
-                Console.WriteLine("Recipt at store: "+recipt.StoreName);
+                Console.WriteLine("Recipt at store: "+receipt.StoreName);
 
                 //Insert store
                 MySqlCommand comm = db.Connection.CreateCommand();
@@ -79,30 +79,31 @@ namespace sqltest
                     "ON DUPLICATE KEY UPDATE " +
                     "Name = ?name, State = ?state, City = ?city, PostalCode = ?postal, Address = ?address;";
 
-                comm.Parameters.Add("?name", MySqlDbType.VarChar).Value = recipt.StoreName;
-                comm.Parameters.Add("?state", MySqlDbType.VarChar).Value = recipt.State;
-                comm.Parameters.Add("?city", MySqlDbType.VarChar).Value = recipt.City;
-                comm.Parameters.Add("?postal", MySqlDbType.VarChar).Value = recipt.PostalCode;
-                comm.Parameters.Add("?address", MySqlDbType.VarChar).Value = recipt.Street;
+                comm.Parameters.Add("?name", MySqlDbType.VarChar).Value = receipt.StoreName;
+                comm.Parameters.Add("?state", MySqlDbType.VarChar).Value = receipt.State;
+                comm.Parameters.Add("?city", MySqlDbType.VarChar).Value = receipt.City;
+                comm.Parameters.Add("?postal", MySqlDbType.VarChar).Value = receipt.PostalCode;
+                comm.Parameters.Add("?address", MySqlDbType.VarChar).Value = receipt.Street;
 
                 comm.ExecuteNonQuery();
 
                 //Get the store id
                 int storeId = -1;
-                foreach (DataRow row in db.Query("SELECT StoreId FROM tracker.stores WHERE Address = ?address", new () { ("?address", MySqlDbType.VarChar, recipt.Street) })) 
+                foreach (DataRow row in db.Query("SELECT StoreId FROM tracker.stores WHERE Address = ?address", new () { ("?address", MySqlDbType.VarChar, receipt.Street) })) 
                     storeId = int.Parse(row[0].ToString());
 
                 //Insert recipt
                 comm = db.Connection.CreateCommand();
-                comm.CommandText = "INSERT INTO Receipts(StoreId, UserId, ReceiptDate, Subtotal, Tax, Total, PhoneNumber, PaymentType) VALUE (?store_id, ?user, CURRENT_TIMESTAMP, ?sub_total, ?tax, ?total, ?phone, ?payment);";
+                comm.CommandText = "INSERT INTO Receipts(StoreId, UserId, ReceiptDate, Subtotal, Tax, Total, PhoneNumber, PaymentType) VALUE (?store_id, ?user, ?date, ?sub_total, ?tax, ?total, ?phone, ?payment);";
 
                 comm.Parameters.Add("?user", MySqlDbType.VarChar).Value = userId;
-                comm.Parameters.Add("?phone", MySqlDbType.VarChar).Value = recipt.PhoneNumber;
-                comm.Parameters.Add("?sub_total", MySqlDbType.Decimal).Value = recipt.SubTotal;
-                comm.Parameters.Add("?total", MySqlDbType.Decimal).Value = recipt.Total;
-                comm.Parameters.Add("?tax", MySqlDbType.Decimal).Value = recipt.Tax1;
-                comm.Parameters.Add("?payment", MySqlDbType.Enum).Value = recipt.PaymentType;
+                comm.Parameters.Add("?phone", MySqlDbType.VarChar).Value = receipt.PhoneNumber;
+                comm.Parameters.Add("?sub_total", MySqlDbType.Decimal).Value = receipt.SubTotal;
+                comm.Parameters.Add("?total", MySqlDbType.Decimal).Value = receipt.Total;
+                comm.Parameters.Add("?tax", MySqlDbType.Decimal).Value = receipt.Tax1;
+                comm.Parameters.Add("?payment", MySqlDbType.Enum).Value = receipt.PaymentType;
                 comm.Parameters.Add("?store_id", MySqlDbType.Int64).Value = storeId;
+                comm.Parameters.Add("?date", MySqlDbType.DateTime).Value = receipt.ReceiptDate;
 
                 comm.ExecuteNonQuery();
 
@@ -111,7 +112,7 @@ namespace sqltest
                 foreach (DataRow row in db.Query("SELECT MAX(ReceiptId) FROM tracker.receipts", new() { })) reciptId = int.Parse(row[0].ToString());
 
                 //Insert the Items
-                foreach(PurchasedItem item in recipt.PurchasedItems)
+                foreach(PurchasedItem item in receipt.PurchasedItems)
                 {
                     comm = db.Connection.CreateCommand();
                     comm.CommandText = "INSERT INTO Items(ReceiptId, Name, Price, Quantity) VALUE (?receipt_id, ?name, ?price, ?quantity);";
@@ -260,15 +261,31 @@ namespace sqltest
             });
             
             //Number of Items
-            events.Add("/count_stores", (JObject? body) =>
+            events.Add("/count_receipts", (JObject? body) =>
             {
                 //Needs Database
                 if (db == null) return "No Database";
 
                 int result = -1;
-                foreach (DataRow row in db.Query("SELECT COUNT(*) FROM tracker.stores;", new() { }))
+                foreach (DataRow row in db.Query("SELECT COUNT(*) FROM tracker.receipts;", new() { }))
                 {
                     result = int.Parse(row[0].ToString());
+                }
+
+                string response = JsonConvert.SerializeObject(result);
+                return response;
+            });
+
+            //Number of Items
+            events.Add("/count_spent", (JObject? body) =>
+            {
+                //Needs Database
+                if (db == null) return "No Database";
+
+                decimal result = -1;
+                foreach (DataRow row in db.Query("SELECT SUM(Total) AS Spent FROM tracker.receipts;", new() { }))
+                {
+                    result = decimal.Parse(row[0].ToString());
                 }
 
                 string response = JsonConvert.SerializeObject(result);
@@ -306,7 +323,8 @@ namespace sqltest
                     FROM tracker.stores S
 	                    LEFT JOIN tracker.receipts R ON R.StoreId = S.StoreId
 	                    LEFT JOIN tracker.items I ON I.ReceiptId = R.ReceiptId
-                    GROUP BY S.Name, S.Address;
+                    GROUP BY S.Name, S.Address
+                    ORDER BY Spent DESC;
                 ", new() { }))
                 {
                     items.Add((row[0].ToString(), row[1].ToString(), row[2].ToString(), Convert.ToDecimal(row[3].ToString())));
@@ -328,7 +346,8 @@ namespace sqltest
                     FROM tracker.users U
 	                    LEFT JOIN tracker.receipts R ON R.UserId = U.UserId
 	                    LEFT JOIN tracker.items I ON I.ReceiptId = R.ReceiptId
-                    GROUP BY U.Email;
+                    GROUP BY U.Email
+                    ORDER BY Spent DESC;
                 ", new() { }))
                 {
                     items.Add((row[0].ToString(), Convert.ToDecimal(row[1].ToString())));
@@ -376,6 +395,61 @@ namespace sqltest
                 return response;
             });
 
+            //Purchased Items from user
+            events.Add("/item_dates_from_user", (JObject? body) =>
+            {
+                //Needs Database
+                if (db == null) return "No Database";
+
+                //User Id
+                if (body["UserId"] == null)
+                    return "UserId object not found";
+                string userId = body["UserId"]!.ToString();
+
+                List<(string, decimal, DateTime)> items = new();
+                foreach (DataRow row in db.Query(@"
+                        SELECT Name,
+	                        SUM(Price*Quantity) AS Spent,
+                            ReceiptDate
+                        FROM tracker.items I
+	                        INNER JOIN tracker.receipts R ON I.ReceiptId = R.ReceiptId
+                        WHERE R.UserId = ?user_id
+                        GROUP BY Name, ReceiptDate
+                        ORDER BY ReceiptDate ASC;
+                    ", new() { ("?user_id", MySqlDbType.VarChar, userId) }))
+                {
+                    items.Add((row[0].ToString(), Convert.ToDecimal(row[1].ToString()), Convert.ToDateTime(row[2].ToString())));
+                }
+                string response = JsonConvert.SerializeObject(items);
+                return response;
+            });
+
+            //Purcases from user of date
+            events.Add("/user_purchases", (JObject? body) =>
+            {
+                //Needs Database
+                if (db == null) return "No Database";
+
+                //User Id
+                if (body["UserId"] == null)
+                    return "UserId object not found";
+                string userId = body["UserId"]!.ToString();
+
+                List<(string, decimal, DateTime)> items = new();
+                foreach (DataRow row in db.Query(@"
+                        SELECT ReceiptId,
+	                        Total,
+	                        ReceiptDate
+                        FROM tracker.receipts
+                        WHERE UserId = ?user_id
+                        ORDER BY ReceiptDate;
+                    ", new() { ("?user_id", MySqlDbType.VarChar, userId) }))
+                {
+                    items.Add((row[0].ToString(), Convert.ToDecimal(row[1].ToString()), Convert.ToDateTime(row[2].ToString())));
+                }
+                string response = JsonConvert.SerializeObject(items);
+                return response;
+            });
 
 
             //Start the server

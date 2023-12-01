@@ -21,7 +21,7 @@ namespace DummyConnection
                 new { email = "kaelwilliam@ksu.edu", password = "abc123" },
                 (string response) => { MessageBox.Show(response); }
             );
-            */
+            
             Server.Request(
                 "/all_users",
                 new {  },
@@ -43,17 +43,21 @@ namespace DummyConnection
                 }
            );
 
+*/
+            
             Server.Request(
-                "/all_users",
-                new { },
+                "/user_purchases",
+                new { UserId = 2 },
                 (string response) => {
-                    List<(string, string)> result = JsonConvert.DeserializeObject<List<(string, string)>>(response);
-                    foreach ((string, string) l in result)
+                    List<(string, decimal, DateTime)> result = JsonConvert.DeserializeObject<List<(string, decimal, DateTime)>>(response);
+                    foreach ((string, decimal, DateTime) l in result)
                     {
                         Debug.WriteLine(l);
                     }
                 }
             );
+            
+
         }
 
 
